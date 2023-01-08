@@ -3,7 +3,7 @@ from typing import Tuple, List
 
 class Hexagon:
     
-    radius: int = 26
+    radius: int = 30
     position: tuple([float, float])
     colour = (56,93,56)
     highlight = (82,97,82)
