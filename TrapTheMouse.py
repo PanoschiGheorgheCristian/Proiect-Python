@@ -1,4 +1,4 @@
-import pygame, numpy as np, sys, math
+import pygame, numpy as np, sys, math, random
 from hexagon import Hexagon
 
 pygame.init()
@@ -7,8 +7,8 @@ BACKGROUND = (21,76,121)
 TILES = (56,93,56)
 HIGHLIGHTEDTILES = (82,97,82)
 DESTROYEDTILES = (0,0,0)
-SCREENWIDTH = 800
-SCREENHEIGHT = 800
+SCREENWIDTH = 750
+SCREENHEIGHT = 700
 BOARDSHAPE = (11,11)
 HEXRADIUS = 30
 HEXMINIMALDISTANCE = HEXRADIUS / 2 * math.sqrt(3)
@@ -26,8 +26,14 @@ for index1 in  range(11):
         else:
             board.append(Hexagon(100 + HEXMINIMALDISTANCE + index2 * HEXMINIMALDISTANCE * 2, 100 + 1.5 * HEXRADIUS + (index1 - 1) * 1.5 * HEXRADIUS, 0))
 
+broken_tiles_nr = random.randint(5,12)
+for index in range(broken_tiles_nr):
+    tile = random.randint(1, 121)
+    board[tile].destroy_hex()
+    
+
 while GameRunning:
-    x, y = pygame.mouse.get_pos()
+    coursor_x, coursor_y = pygame.mouse.get_pos()
     
     for event in pygame.event.get():
         

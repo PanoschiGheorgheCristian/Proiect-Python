@@ -15,6 +15,8 @@ class Hexagon:
         self.position = coordinates
         self.destroyed = destroyed
         self.vertices = self.compute_vertices()
+        if destroyed == 1:
+            self.colour = (0,0,0)
         
     def compute_vertices(self) -> List[Tuple[float, float]]:
         x, y = self.position
@@ -29,6 +31,12 @@ class Hexagon:
             (x + minimal_radius, y + half_radius)
         ]
     
+    def destroy_hex(self) -> None:
+        self.destroyed = 1
+    
     def render(self, screen) -> None:
-        pygame.draw.polygon(screen, self.colour, self.vertices)
-        pygame.draw.polygon(screen, (0,0,0), self.vertices, 1)
+        if self.destroyed == 0:
+            pygame.draw.polygon(screen, self.colour, self.vertices)
+            pygame.draw.polygon(screen, (0,0,0), self.vertices, 1)
+        else:
+            pygame.draw.polygon(screen, (0,0,0), self.vertices)
