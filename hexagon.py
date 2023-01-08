@@ -13,6 +13,7 @@ class Hexagon:
     colour = TILE
     highlight = HIGHLIGHTEDTILE
     destroyed: int = 0
+    has_mouse: int = 0
     minimal_radius: float = math.sqrt(3) * radius / 2
     
     def __init__(self, x, y, destroyed) -> None:
@@ -46,6 +47,8 @@ class Hexagon:
     def update_highlight(self, coursor_x, coursor_y) -> None:
         if self.inside_point(coursor_x, coursor_y) == False:
             self.colour = TILE
+        if self.inside_point(coursor_x, coursor_y) and self.has_mouse == 0:
+            self.colour = HIGHLIGHTEDTILE
     
     def render(self, screen) -> None:
         if self.destroyed == 0:
