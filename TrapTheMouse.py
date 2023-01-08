@@ -7,6 +7,9 @@ BACKGROUND = (21,76,121)
 TILE = (56,93,56)
 HIGHLIGHTEDTILE = (82,97,82)
 DESTROYEDTILE = (0,0,0)
+WINTEXT = (178,151,0)
+LOSETEXT = (238,75,43)
+ENDGAMETEXTBCK = (200,200,200)
 SCREENWIDTH = 750
 SCREENHEIGHT = 700
 BOARDSHAPE = (11,11)
@@ -28,26 +31,25 @@ def get_index_of_neighbours(index):
         down_right = index + 12
     
     if index < 11 or index % 22 == 0:
-        up_left = -1
+        up_left = -2
     if index < 11 or index % 22 == 21:
-        up_right = -1
+        up_right = -2
     if index % 11 == 0:
-        left = -1
+        left = -2
     if index % 11 == 10:
-        right = -1
+        right = -2
     if index > 109 or index % 22 == 0:
-        down_left = -1
+        down_left = -2
     if index > 109 or index % 22 == 21:
-        down_right = -1
+        down_right = -2
     
     return up_left, left, down_left, down_right, right, up_right
 
 def get_moves(board, index):
     moves = list(get_index_of_neighbours(index))
     
-    
     for index in range(6):
-        if moves[index] != -1:
+        if moves[index] > -1:
             if board[moves[index]].destroyed == 1:
                 moves[index] = -1 
     return moves            
@@ -79,15 +81,67 @@ def render(board, screen):
     screen.blit( mouse_image, mouse_position )
     
     pygame.display.update()
-            
-def move_mouse(board):
-    global mouse_index
-    global mouse_position
-    moves = get_moves(board, mouse_index)
-    
+
+def lose_game():
+    global font
+    text = font.render('You lost', True, LOSETEXT, ENDGAMETEXTBCK)
+    textRect = text.get_rect()
+    textRect.center = (375, 350)
+    screen.blit(text, textRect)
+    pygame.display.update()
+    pygame.time.wait(3000)
+    pygame.quit()
+    quit()
+
+def win_game():
+    global font
+    text = font.render('You win!', True, WINTEXT, ENDGAMETEXTBCK)
+    textRect = text.get_rect()
+    textRect.center = (375, 350)
+    screen.blit(text, textRect)
+    pygame.display.update()
+    pygame.time.wait(3000)
+    pygame.quit()
+    quit()
+
+def move_by_player(board, moves):
+    asd
+
+def move_by_c1(moves):
     move_to = moves[random.randint(0,5)]
     while move_to == -1:
         move_to = moves[random.randint(0,5)]
+        
+    return move_to
+
+def move_by_c2(board, moves):
+    asd
+
+def move_by_c3(board, moves):
+    asd
+            
+def move_mouse(board, game_mode):
+    global mouse_index
+    global mouse_position
+    moves = get_moves(board, mouse_index)
+    possible_moves = 0
+    
+    for move in moves:
+        if move == -2:
+            lose_game()
+        elif move != -1:
+            possible_moves = possible_moves + 1
+    if possible_moves == 0:
+        win_game()
+    
+    if game_mode == 0:
+        move_to = move_by_player(board, moves)
+    elif game_mode == 1:
+        move_to = move_by_c1(moves)
+    elif game_mode == 2:
+        move_to = move_by_c2(board, moves)
+    else:
+        move_to = move_by_c3(board, moves)
         
     board[mouse_index].has_mouse = 0
     board[move_to].has_mouse = 1
@@ -99,6 +153,20 @@ GameRunning = True
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
 pygame.display.set_caption('Trap the Mouse')
+font = pygame.font.SysFont('arial', 64)
+
+argument = sys.argv[1]
+if argument == "human":
+    game_mode = 0
+elif argument == "computer1":
+    game_mode = 1
+elif argument == "computer2":
+    game_mode = 2
+elif argument == "computer3":
+    game_mode = 3
+else:
+    print("Argument in not adequate; try human for a human opponent, or computer1-3 for an AI opponent.")
+    quit()
 
 board = []
 initialize_board(board)
@@ -122,9 +190,8 @@ while GameRunning:
                 if hex.inside_point(coursor_x, coursor_y) and hex.has_mouse == 0 and hex.destroyed == 0:
                     hex.destroy_hex()
                     player_turn = 0
+
     if player_turn == 0:
         move_mouse(board)
-    
-    render(board, screen)
-    
-pygame.quit()
+
+    render(board, screen)    
