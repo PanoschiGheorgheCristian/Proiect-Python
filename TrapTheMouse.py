@@ -39,6 +39,17 @@ while GameRunning:
         
         if event.type == pygame.QUIT:
             GameRunning = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            for hex in board:
+                if hex.inside_point(coursor_x, coursor_y):
+                    hex.destroy_hex()
+
+    for hex in board:
+        hex.update_highlight(coursor_x, coursor_y)
+
+    for hex in board:
+        if hex.inside_point(coursor_x, coursor_y):
+            hex.colour = HIGHLIGHTEDTILES
 
     clock.tick(60)
     
