@@ -64,7 +64,7 @@ def initialize_board(board):
                 board.append(Hexagon(100 + HEXMINIMALDISTANCE + index2 * HEXMINIMALDISTANCE * 2, 100 + 1.5 * HEXRADIUS + (index1 - 1) * 1.5 * HEXRADIUS, 0))
 
 def initialize_broken_tiles(board):
-    broken_tiles_nr = random.randint(5,15)
+    broken_tiles_nr = random.randint(10,15)
     for index in range(broken_tiles_nr):
         tile = random.randint(0, 120)
         if tile != 60:
@@ -84,7 +84,11 @@ def render(board, screen):
 
 def lose_game():
     global font
-    text = font.render('You lost', True, LOSETEXT, ENDGAMETEXTBCK)
+    global game_mode
+    if game_mode == 0:
+        text = font.render('Player 2 Wins!', True, LOSETEXT, ENDGAMETEXTBCK)
+    else:
+        text = font.render('You lost', True, LOSETEXT, ENDGAMETEXTBCK)
     textRect = text.get_rect()
     textRect.center = (375, 350)
     screen.blit(text, textRect)
@@ -95,7 +99,11 @@ def lose_game():
 
 def win_game():
     global font
-    text = font.render('You win!', True, WINTEXT, ENDGAMETEXTBCK)
+    global game_mode
+    if game_mode == 0:
+        text = font.render('Player 1 Wins!', True, WINTEXT, ENDGAMETEXTBCK)
+    else:
+        text = font.render('You win!', True, WINTEXT, ENDGAMETEXTBCK)
     textRect = text.get_rect()
     textRect.center = (375, 350)
     screen.blit(text, textRect)
@@ -105,7 +113,16 @@ def win_game():
     quit()
 
 def move_by_player(board, moves):
-    asd
+    while 1:
+        coursor_x, coursor_y = pygame.mouse.get_pos()
+        render(board, screen)
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for move in moves:
+                    if move != -2 and move != -1:
+                        if board[move].inside_point(coursor_x, coursor_y):
+                            move_to = move
+                            return move_to
 
 def move_by_c1(moves):
     move_to = moves[random.randint(0,5)]
@@ -114,11 +131,131 @@ def move_by_c1(moves):
         
     return move_to
 
-def move_by_c2(board, moves):
-    asd
+def move_by_c2(board, mouse_index):
+    moves = get_moves(board, mouse_index)
+    
+    global visited_nodes
+    global nodes_to_visit
+    
+    visited_nodes.clear()
+    nodes_to_visit.clear()
+    
+    visited_nodes.append(mouse_index)
+    
+    for move in moves:
+        if move != -1:
+            nodes_to_visit.append(move)
+            
+    found_exit = 0
+    
+    while len(nodes_to_visit) > 0 and found_exit == 0:
+        moves = get_moves(board, nodes_to_visit[0])
+        visited_nodes.append(nodes_to_visit[0])
+        nodes_to_visit.pop(0)
+        
+        for move in moves:
+            move_is_made = 0
+            if move in visited_nodes or move in nodes_to_visit:
+                move_is_made = 1
+            if move == -2 and move_is_made == 0:
+                found_exit = 1
+                break
+            if move != -1 and move_is_made == 0:
+                nodes_to_visit.append(move)
+    
+    end_point = visited_nodes[len(visited_nodes) - 1]
+    
+    print(end_point)
+    
+    moves = get_moves(board, mouse_index)
+    move_value = [0,0,0,0,0,0]
+    
+    
+    for index in range(6):
+        if moves[index] == -1:
+            move_value[index] = -999
+    
+    end_point_x = end_point % 11 + 1
+    end_point_y = (end_point - end_point % 11) // 11 + 1
+    mouse_x = mouse_index % 11 + 1
+    mouse_y = (mouse_index - mouse_index % 11) // 11 + 1
+    
+    move_value[0] = move_value[0] + ( mouse_x - end_point_x ) / 2 + ( mouse_y - end_point_y )
+    move_value[2] = move_value[2] + ( mouse_x - end_point_x ) / 2 + ( end_point_y - mouse_y )
+    move_value[3] = move_value[3] + ( end_point_x - mouse_x ) / 2 + ( end_point_y - mouse_y )
+    move_value[5] = move_value[5] + ( end_point_x - mouse_x ) / 2 + ( mouse_y - end_point_y )
+    move_value[1] = move_value[1] + ( mouse_x - end_point_x )
+    move_value[4] = move_value[4] + ( end_point_x - mouse_x )
+    
+    print(move_value)
+    print(moves[move_value.index(max(move_value))])
+    return moves[move_value.index(max(move_value))]
 
-def move_by_c3(board, moves):
-    asd
+def move_by_c3(board, mouse_index):
+    moves = get_moves(board, mouse_index)
+    
+    global visited_nodes
+    global nodes_to_visit
+    
+    visited_nodes.clear()
+    nodes_to_visit.clear()
+    
+    visited_nodes.append(mouse_index)
+    
+    for move in moves:
+        if move != -1:
+            nodes_to_visit.append(move)
+            
+    found_exit = 0
+    
+    while len(nodes_to_visit) > 0 and found_exit == 0:
+        moves = get_moves(board, nodes_to_visit[0])
+        visited_nodes.append(nodes_to_visit[0])
+        nodes_to_visit.pop(0)
+        
+        for move in moves:
+            move_is_made = 0
+            if move in visited_nodes or move in nodes_to_visit:
+                move_is_made = 1
+            if move == -2 and move_is_made == 0:
+                found_exit = 1
+                break
+            if move != -1 and move_is_made == 0:
+                nodes_to_visit.append(move)
+    
+    end_point = visited_nodes[len(visited_nodes) - 1]
+    
+    print(end_point)
+    
+    moves = get_moves(board, mouse_index)
+    move_value = [0,0,0,0,0,0]
+    
+    for index_0 in range(6):
+        if moves[index_0] != -1:
+            moves_next_turn = get_moves(board, moves[index_0])
+            for index in range(6):
+                if moves_next_turn[index] == -1 and moves_next_turn[(index + 1) % 6] == -1 and moves_next_turn[(index + 2) % 6] == -1 and moves_next_turn[(index + 3) % 6] == -1:
+                    move_value[index_0] = -999
+    
+    for index in range(6):
+        if moves[index] == -1:
+            move_value[index] = -999
+    
+    end_point_x = end_point % 11 + 1
+    end_point_y = (end_point - end_point % 11) // 11 + 1
+    mouse_x = mouse_index % 11 + 1
+    mouse_y = (mouse_index - mouse_index % 11) // 11 + 1
+    
+    move_value[0] = move_value[0] + ( mouse_x - end_point_x ) / 2 + ( mouse_y - end_point_y )
+    move_value[2] = move_value[2] + ( mouse_x - end_point_x ) / 2 + ( end_point_y - mouse_y )
+    move_value[3] = move_value[3] + ( end_point_x - mouse_x ) / 2 + ( end_point_y - mouse_y )
+    move_value[5] = move_value[5] + ( end_point_x - mouse_x ) / 2 + ( mouse_y - end_point_y )
+    move_value[1] = move_value[1] + ( mouse_x - end_point_x )
+    move_value[4] = move_value[4] + ( end_point_x - mouse_x )
+    
+    print(move_value)
+    print(moves[move_value.index(max(move_value))])
+    return moves[move_value.index(max(move_value))]
             
 def move_mouse(board, game_mode):
     global mouse_index
@@ -139,9 +276,9 @@ def move_mouse(board, game_mode):
     elif game_mode == 1:
         move_to = move_by_c1(moves)
     elif game_mode == 2:
-        move_to = move_by_c2(board, moves)
+        move_to = move_by_c2(board, mouse_index)
     else:
-        move_to = move_by_c3(board, moves)
+        move_to = move_by_c3(board, mouse_index)
         
     board[mouse_index].has_mouse = 0
     board[move_to].has_mouse = 1
@@ -171,6 +308,9 @@ else:
 board = []
 initialize_board(board)
 initialize_broken_tiles(board)
+exits = [0,1,2,3,4,11,22,33,44,55,66,77,88,99,110,111,112,113,114,115,116,117,118,119,120,109,98,87,76,65,54,43,32,21,10,9,8,7,6,5]
+visited_nodes = []
+nodes_to_visit = []
 
 mouse_image = pygame.image.load("Assets/mouse.png").convert_alpha()
 mouse_position = (board[60].center[0] - 20, board[60].center[1] - 20)
@@ -192,6 +332,6 @@ while GameRunning:
                     player_turn = 0
 
     if player_turn == 0:
-        move_mouse(board)
+        move_mouse(board, game_mode)
 
     render(board, screen)    
